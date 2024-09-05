@@ -115,4 +115,4 @@ Avec l'essor du télétravail et des environnements de travail flexibles, le mar
 
 1. **Cloner le dépôt :**
    ```bash
-   git clone https://github.com/username/workpal.git
+   git clone https://github.com/rabiilfarakh/workpal.git
