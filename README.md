@@ -13,6 +13,15 @@ Avec l'essor du télétravail et des environnements de travail flexibles, le mar
 
 ## Fonctionnalités
 
+## Diagrammes
+
+### Use case 
+
+![Use case diagram (1)](https://github.com/user-attachments/assets/1c2953fd-8d22-4e67-afc3-e02811593137)
+![Use case diagram (2)](https://github.com/user-attachments/assets/c3ba7f34-622e-4a94-a112-30cc291cd045)
+![Use case diagram (4)](https://github.com/user-attachments/assets/8cca497a-448c-49ea-b107-7d7669240408)
+
+
 ### Pour les Membres
 
 - **Inscription et Connexion**
