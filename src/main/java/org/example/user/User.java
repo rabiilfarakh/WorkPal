@@ -1,13 +1,13 @@
 package org.example.user;
 
-public class UserEntity {
+public class User {
     private Integer userId;
     private String username;
     private String email;
     private String password;
     private Role role;
 
-    public UserEntity(Integer userId, String username, String email, String password, Role role) {
+    public User(Integer userId, String username, String email, String password, Role role) {
         this.userId = userId;
         this.username = username;
         this.email = email;
@@ -15,7 +15,7 @@ public class UserEntity {
         this.role = role;
     }
 
-    public UserEntity() {
+    public User() {
     }
 
     public Integer getUserId() {
