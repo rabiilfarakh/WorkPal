@@ -1,15 +1,18 @@
-package org.example.user;
+package org.example.entity;
+
+import org.example.enumeration.Role;
 
 public class User {
-    private Integer userId;
-    private String username;
+
+    private Integer user_id;
+    private String user_name;
     private String email;
     private String password;
     private Role role;
 
-    public User(Integer userId, String username, String email, String password, Role role) {
-        this.userId = userId;
-        this.username = username;
+    public User(Integer user_id, String user_name, String email, String password, Role role) {
+        this.user_id = user_id;
+        this.user_name = user_name;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -18,20 +21,20 @@ public class User {
     public User() {
     }
 
-    public Integer getUserId() {
-        return userId;
+    public Integer getUser_id() {
+        return user_id;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUser_name() {
+        return user_name;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
     }
 
     public String getEmail() {
