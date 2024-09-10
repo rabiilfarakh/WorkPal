@@ -1,8 +1,8 @@
 package org.example.repository.inter;
 
-import org.example.entity.User;
+import org.example.entity.Member;
 
 public interface MemberRepository {
 
-    void register(User user);
+    void register(Member member);
 }

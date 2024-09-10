@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import org.example.entity.Member;
 import org.example.entity.User;
 import org.example.repository.inter.MemberRepository;
 import org.example.service.inter.MemberService;
@@ -13,7 +14,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void register(User user) {
-        memberRepository.register(user);
+    public void register(Member member) {
+        memberRepository.register(member);
     }
 }

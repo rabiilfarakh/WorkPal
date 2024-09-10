@@ -1,8 +1,8 @@
-package org.example.repository.inter;
+package org.example.service.inter;
 
 import org.example.entity.Manager;
 
-public interface ManagerRepository {
+public interface ManagerService {
 
     void register(Manager manager);
 
