@@ -92,8 +92,9 @@ public class auth {
                                 // Menu pour les administrateurs
                                 System.out.println("Choisissez une option :");
                                 System.out.println("1. Gestion des managers");
-                                System.out.println("2. Gestion des abonnements");
-                                System.out.println("3. Déconnecter");
+                                System.out.println("2. Gestion des members");
+                                System.out.println("3. Gestion des abonnements");
+                                System.out.println("4. Déconnecter");
                                 int adminChoice = scanner.nextInt();
                                 scanner.nextLine(); // Nettoyer le scanner
 
@@ -101,16 +102,19 @@ public class auth {
                                     case 1:
                                         // Gestion des managers
                                         GestionManager gestionManager = new GestionManager(connection);
-                                        gestionManager.displayManagerMenu(); // Méthode qui affiche le menu de gestion des managers
+                                        gestionManager.displayManagerMenu();
                                         break;
-
                                     case 2:
+                                        // Gestion des members
+                                        GestionMember gestionMember = new GestionMember(connection);
+                                        gestionMember.displayMemberMenu();
+                                    case 3:
                                         // Gestion des abonnements
                                         System.out.println("Gestion des abonnements en cours...");
-                                        // Ici, vous pouvez implémenter la gestion des abonnements
+                                        // implémenter la gestion des abonnements
                                         break;
 
-                                    case 3:
+                                    case 4:
                                         return;
                                     default:
                                         System.out.println("Choix invalide.");
