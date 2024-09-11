@@ -86,7 +86,7 @@ public class auth {
                         Optional<User> user = userService.login(loginEmail, loginPassword);
 
                         if (user.isPresent()) {
-                            System.out.println(" Hello : " + user.get().getUser_name());//                          System.out.println("Rôle : " + user.get().getRole());
+                            System.out.println("\nHello : #### " + user.get().getUser_name().toUpperCase() +" ####\n");//                          System.out.println("Rôle : " + user.get().getRole());
 
                             if (user.get().getRole() == Role.ADMIN) { // Vérification du rôle de l'utilisateur
                                 // Menu pour les administrateurs
@@ -119,8 +119,6 @@ public class auth {
                             } else {
                                 System.out.println("Vous n'êtes pas autorisé à accéder à ces options.");
                             }
-                        } else {
-                            System.out.println("Email ou mot de passe invalide.");
                         }
 
                         break;

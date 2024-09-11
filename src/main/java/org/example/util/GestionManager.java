@@ -7,6 +7,8 @@ import org.example.service.impl.ManagerServiceImpl;
 import org.example.service.inter.ManagerService;
 
 import java.sql.Connection;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class GestionManager {
@@ -29,7 +31,9 @@ public class GestionManager {
             System.out.println("2. Mettre à jour un manager");
             System.out.println("3. Supprimer un manager");
             System.out.println("4. Afficher tous les managers");
-            System.out.println("5. Quitter");
+            System.out.println("5. Rechercher un manager par ID");
+            System.out.println("6. Rechercher un manager par email");
+            System.out.println("7. Quitter");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // Nettoyer le scanner
@@ -51,27 +55,94 @@ public class GestionManager {
 
                     // Enregistrez le manager
                     managerService.register(newManager);
+                    System.out.println("Manager ajouté avec succès.");
                     break;
 
                 case 2:
-                    // Appel pour mettre à jour un manager
-                    System.out.println("Mise à jour d'un manager...");
-                    // Code pour mise à jour ici
+                    System.out.print("Entrez l'ID du manager à mettre à jour : ");
+                    int updateId = scanner.nextInt();
+                    scanner.nextLine(); // Nettoyer le scanner
+
+                    // Récupérer le manager existant
+                    Optional<Manager> optionalManagerToUpdate = managerService.findById(updateId);
+                    if (optionalManagerToUpdate.isPresent()) {
+                        Manager updateManager = optionalManagerToUpdate.get();
+                        System.out.print("Entrez le nouveau nom d'utilisateur : ");
+                        String updateUsername = scanner.nextLine();
+                        System.out.print("Entrez le nouvel email : ");
+                        String updateEmail = scanner.nextLine();
+                        System.out.print("Entrez le nouveau mot de passe : ");
+                        String updatePassword = scanner.nextLine();
+
+                        // Mettre à jour les informations du manager
+                        updateManager.setUser_name(updateUsername);
+                        updateManager.setEmail(updateEmail);
+                        updateManager.setPassword(updatePassword);
+
+                        // Enregistrez les changements
+                        managerService.update(updateManager);
+                        System.out.println("Manager mis à jour avec succès.");
+                    } else {
+                        System.out.println("Manager non trouvé.");
+                    }
                     break;
 
                 case 3:
-                    // Appel pour supprimer un manager
-                    System.out.println("Suppression d'un manager...");
-                    // Code pour suppression ici
+                    System.out.print("Entrez l'ID du manager à supprimer : ");
+                    int deleteId = scanner.nextInt();
+                    scanner.nextLine(); // Nettoyer le scanner
+
+                    // Supprimer le manager
+                    managerService.deleteById(deleteId);
+                    System.out.println("Manager supprimé avec succès.");
                     break;
 
                 case 4:
-                    // Appel pour afficher tous les managers
-                    System.out.println("Liste de tous les managers...");
-                    // Code pour afficher tous les managers ici
+                    // Afficher tous les managers
+                    List<Manager> managers = managerService.findAll();
+                    if (managers.isEmpty()) {
+                        System.out.println("Aucun manager trouvé.");
+                    } else {
+                        for (Manager manager : managers) {
+                            System.out.println("ID: " + manager.getUser_id() +
+                                    ", Nom d'utilisateur: " + manager.getUser_name() +
+                                    ", Email: " + manager.getEmail());
+                        }
+                    }
                     break;
 
                 case 5:
+                    System.out.print("Entrez l'ID du manager à rechercher : ");
+                    int searchId = scanner.nextInt();
+                    scanner.nextLine(); // Nettoyer le scanner
+
+                    Optional<Manager> optionalManagerById = managerService.findById(searchId);
+                    if (optionalManagerById.isPresent()) {
+                        Manager managerById = optionalManagerById.get();
+                        System.out.println("ID: " + managerById.getUser_id() +
+                                ", Nom d'utilisateur: " + managerById.getUser_name() +
+                                ", Email: " + managerById.getEmail());
+                    } else {
+                        System.out.println("Manager avec cet ID non trouvé.");
+                    }
+                    break;
+
+                case 6:
+                    System.out.print("Entrez l'email du manager à rechercher : ");
+                    String searchEmail = scanner.nextLine();
+
+                    Optional<Manager> optionalManagerByEmail = managerService.findByEmail(searchEmail);
+                    if (optionalManagerByEmail.isPresent()) {
+                        Manager managerByEmail = optionalManagerByEmail.get();
+                        System.out.println("ID: " + managerByEmail.getUser_id() +
+                                ", Nom d'utilisateur: " + managerByEmail.getUser_name() +
+                                ", Email: " + managerByEmail.getEmail());
+                    } else {
+                        System.out.println("Manager avec cet email non trouvé.");
+                    }
+                    break;
+
+                case 7:
                     System.out.println("Au revoir !");
                     System.exit(0);
                     break;

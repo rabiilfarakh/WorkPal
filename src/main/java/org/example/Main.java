@@ -5,7 +5,7 @@ import org.example.smtp.SendMail;
 
 public class Main {
     public static void main(String[] args) {
-        //SendMail.Mail();
+
         auth.handleUserOperations();
 
     }
