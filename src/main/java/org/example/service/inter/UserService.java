@@ -8,4 +8,5 @@ public interface UserService {
 
     Optional<User> login(String email, String paswword);
 
+    void resetPwd(String email,String password);
 }

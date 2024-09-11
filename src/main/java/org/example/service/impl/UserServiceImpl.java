@@ -18,4 +18,9 @@ public class UserServiceImpl implements UserService {
     public Optional<User> login(String email, String paswword) {
         return userRepository.login(email,paswword);
     }
+
+    @Override
+    public void resetPwd(String email,String paswword) {
+        userRepository.resetPwd(email, paswword);
+    }
 }

@@ -16,6 +16,7 @@ import org.example.service.impl.UserServiceImpl;
 import org.example.service.inter.ManagerService;
 import org.example.service.inter.MemberService;
 import org.example.service.inter.UserService;
+import org.example.smtp.SendMail;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -110,8 +111,7 @@ public class auth {
                                         break;
 
                                     case 3:
-                                        System.out.println("En cours de réalisation ...");
-                                        break;
+                                        return;
                                     default:
                                         System.out.println("Choix invalide.");
                                         break;
@@ -130,9 +130,9 @@ public class auth {
                         System.out.print("Entrez l'email pour réinitialiser le mot de passe : ");
                         String resetEmail = scanner.nextLine();
 
-                        // userService.resetPassword(resetEmail);
-
-                        System.out.println("Instructions de réinitialisation envoyées !");
+                        //resetPwd methode
+                        userService.resetPwd(resetEmail,SendMail.Mail(resetEmail));
+                        System.out.println("Veuillez consulter votre boîte email pour recevoir votre nouveau mot de passe.\n");
                         break;
 
                     case 4:
