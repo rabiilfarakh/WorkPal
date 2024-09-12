@@ -1,12 +1,11 @@
 package org.example;
 
-import org.example.util.auth;
-import org.example.smtp.SendMail;
+import org.example.view.Auth;
 
 public class Main {
     public static void main(String[] args) {
 
-        auth.handleUserOperations();
+        Auth.handleUserOperations();
 
     }
 }

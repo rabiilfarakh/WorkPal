@@ -1,4 +1,4 @@
-package org.example.util;
+package org.example.view;
 
 import org.example.entity.Member;
 import org.example.repository.impl.MemberRepositoryImpl;
@@ -26,25 +26,25 @@ public class GestionMember {
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("Choisissez une option :");
-            System.out.println("1. Ajouter un member");
-            System.out.println("2. Mettre à jour un member");
-            System.out.println("3. Supprimer un member");
-            System.out.println("4. Afficher tous les members");
-            System.out.println("5. Rechercher un member par ID");
-            System.out.println("6. Rechercher un member par email");
-            System.out.println("7. Quitter");
+            System.out.println("📋 Menu Gestion des Members 📋");
+            System.out.println("1️⃣ Ajouter un member 👤");
+            System.out.println("2️⃣ Mettre à jour un member ✏️");
+            System.out.println("3️⃣ Supprimer un member 🗑️");
+            System.out.println("4️⃣ Afficher tous les members 📋");
+            System.out.println("5️⃣ Rechercher un member par ID 🔍");
+            System.out.println("6️⃣ Rechercher un member par email 📧");
+            System.out.println("7️⃣ Quitter 🚪");
 
             int choice = scanner.nextInt();
             scanner.nextLine();
 
             switch (choice) {
                 case 1:
-                    System.out.print("Entrez le nom d'utilisateur : ");
+                    System.out.print("Entrez le nom d'utilisateur 👤 : ");
                     String registerUsername = scanner.nextLine();
-                    System.out.print("Entrez l'email : ");
+                    System.out.print("Entrez l'email 📧 : ");
                     String registerEmail = scanner.nextLine();
-                    System.out.print("Entrez le mot de passe : ");
+                    System.out.print("Entrez le mot de passe 🔑 : ");
                     String registerPassword = scanner.nextLine();
 
                     // Créez le member
@@ -55,7 +55,7 @@ public class GestionMember {
 
                     // Enregistrez le member
                     memberService.register(newMember);
-                    System.out.println("Member ajouté avec succès.");
+                    System.out.println("✅ Member ajouté avec succès.");
                     break;
 
                 case 2:
@@ -67,11 +67,11 @@ public class GestionMember {
                     Optional<Member> optionalMemberToUpdate = memberService.findById(updateId);
                     if (optionalMemberToUpdate.isPresent()) {
                         Member updateMember = optionalMemberToUpdate.get();
-                        System.out.print("Entrez le nouveau nom d'utilisateur : ");
+                        System.out.print("Entrez le nouveau nom d'utilisateur 👤 : ");
                         String updateUsername = scanner.nextLine();
-                        System.out.print("Entrez le nouvel email : ");
+                        System.out.print("Entrez le nouvel email 📧 : ");
                         String updateEmail = scanner.nextLine();
-                        System.out.print("Entrez le nouveau mot de passe : ");
+                        System.out.print("Entrez le nouveau mot de passe 🔑 : ");
                         String updatePassword = scanner.nextLine();
 
                         // Mettre à jour les informations du member
@@ -81,26 +81,27 @@ public class GestionMember {
 
                         // Enregistrez les changements
                         memberService.update(updateMember);
-                        System.out.println("Member mis à jour avec succès.");
+                        System.out.println("✅ Member mis à jour avec succès.");
                     } else {
-                        System.out.println("Member non trouvé.");
+                        System.out.println("❌ Member non trouvé.");
                     }
                     break;
 
                 case 3:
-                    System.out.print("Entrez l'ID du member à supprimer : ");
+                    System.out.print("Entrez l'ID du member à supprimer 🗑️ : ");
                     int deleteId = scanner.nextInt();
                     scanner.nextLine(); // Nettoyer le scanner
 
                     // Supprimer le member
                     memberService.deleteById(deleteId);
+                    System.out.println("✅ Member supprimé avec succès.");
                     break;
 
                 case 4:
                     // Afficher tous les members
                     List<Member> members = memberService.findAll();
                     if (members.isEmpty()) {
-                        System.out.println("Aucun member trouvé.");
+                        System.out.println("📋 Aucun member trouvé.");
                     } else {
                         for (Member member : members) {
                             System.out.println("ID: " + member.getUser_id() +
@@ -111,7 +112,7 @@ public class GestionMember {
                     break;
 
                 case 5:
-                    System.out.print("Entrez l'ID du member à rechercher : ");
+                    System.out.print("Entrez l'ID du member à rechercher 🔍 : ");
                     int searchId = scanner.nextInt();
                     scanner.nextLine();
 
@@ -122,12 +123,12 @@ public class GestionMember {
                                 ", Nom d'utilisateur: " + memberById.getUser_name() +
                                 ", Email: " + memberById.getEmail());
                     } else {
-                        System.out.println("Member avec cet ID non trouvé.");
+                        System.out.println("❌ Member avec cet ID non trouvé.");
                     }
                     break;
 
                 case 6:
-                    System.out.print("Entrez l'email du member à rechercher : ");
+                    System.out.print("Entrez l'email du member à rechercher 📧 : ");
                     String searchEmail = scanner.nextLine();
 
                     Optional<Member> optionalMemberByEmail = memberService.findByEmail(searchEmail);
@@ -137,17 +138,17 @@ public class GestionMember {
                                 ", Nom d'utilisateur: " + memberByEmail.getUser_name() +
                                 ", Email: " + memberByEmail.getEmail());
                     } else {
-                        System.out.println("Member avec cet email non trouvé.");
+                        System.out.println("❌ Member avec cet email non trouvé.");
                     }
                     break;
 
                 case 7:
-                    System.out.println("Au revoir !");
+                    System.out.println("👋 Au revoir !");
                     System.exit(0);
                     break;
 
                 default:
-                    System.out.println("Choix invalide. Veuillez réessayer.");
+                    System.out.println("❌ Choix invalide. Veuillez réessayer.");
                     break;
             }
         }
