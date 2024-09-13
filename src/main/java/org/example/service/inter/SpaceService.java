@@ -1,12 +1,11 @@
-package org.example.repository.inter;
+package org.example.service.inter;
 
-import org.example.entity.Manager;
 import org.example.entity.Space;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface SpaceRepository {
+public interface SpaceService {
 
     // Create
     Space save(Space space);

@@ -33,10 +33,11 @@ public class ManagerRepositoryImpl implements ManagerRepository {
             statement.setString(1, manager.getUser_name());
             statement.setString(2, manager.getEmail());
             statement.setString(3, hashedPwd);
-            statement.setString(4, "MANAGER");
+            statement.setString(4, "GESTIONNAIRE");
 
-            statement.executeUpdate();
-            System.out.println("Manager registered successfully");
+            int result = statement.executeUpdate();
+            if(result>0)
+                System.out.println("Manager registered successfully");
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());

@@ -1,5 +1,5 @@
 package org.example.enumeration;
 
 public enum Role {
-    ADMIN,MANAGER,MEMBER
+    ADMIN,GESTIONNAIRE,MEMBER
 }
