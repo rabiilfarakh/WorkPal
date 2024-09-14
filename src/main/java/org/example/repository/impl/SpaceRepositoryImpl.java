@@ -1,6 +1,7 @@
 package org.example.repository.impl;
 
 import org.example.entity.Space;
+import org.example.entity.SpaceType;
 import org.example.repository.inter.SpaceRepository;
 
 import java.sql.*;
@@ -27,7 +28,7 @@ public class SpaceRepositoryImpl implements SpaceRepository {
             statement.setInt(4, space.getPrice());
             statement.setBoolean(5, space.isAvailable());
             statement.setInt(6, space.getManager().getUser_id());
-            statement.setInt(7, space.getSpaceType().getSpaceType_id());
+            statement.setInt(7, space.getSpaceType() != null ? space.getSpaceType().getSpaceType_id() : null);
 
             int rowsAffected = statement.executeUpdate();
 
@@ -46,7 +47,9 @@ public class SpaceRepositoryImpl implements SpaceRepository {
 
     @Override
     public Optional<Space> findById(Integer space_id) {
-        String sql = "SELECT * FROM spaces WHERE space_id = ?";
+        String sql = "SELECT s.*, st.name AS space_type_name, st.space_type_id AS space_type_id FROM spaces s " +
+                "LEFT JOIN space_type st ON s.space_type_id = st.space_type_id " +
+                "WHERE s.space_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, space_id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -64,9 +67,12 @@ public class SpaceRepositoryImpl implements SpaceRepository {
     @Override
     public List<Space> findAll() {
         List<Space> spaces = new ArrayList<>();
-        String sql = "SELECT * FROM spaces";
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        String sql = "SELECT s.*, st.name AS space_type_name, st.space_type_id AS space_type_id FROM spaces s " +
+                "LEFT JOIN space_type st ON s.space_type_id = st.space_type_id";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
             while (resultSet.next()) {
                 Space space = mapRowToSpace(resultSet);
                 spaces.add(space);
@@ -88,7 +94,7 @@ public class SpaceRepositoryImpl implements SpaceRepository {
             statement.setInt(4, space.getPrice());
             statement.setBoolean(5, space.isAvailable());
             statement.setInt(6, space.getManager().getUser_id());
-            statement.setInt(7, space.getSpaceType().getSpaceType_id());
+            statement.setInt(7, space.getSpaceType() != null ? space.getSpaceType().getSpaceType_id() : null);
             statement.setInt(8, space.getSpace_id());
 
             int rowsAffected = statement.executeUpdate();
@@ -123,11 +129,19 @@ public class SpaceRepositoryImpl implements SpaceRepository {
         space.setPrice(resultSet.getInt("price"));
         space.setAvailable(resultSet.getBoolean("available"));
 
-        // Assuming the manager and space type entities are loaded separately
-        int managerId = resultSet.getInt("manager_id");
+        // Mapping SpaceType, handling potential nulls
         int spaceTypeId = resultSet.getInt("space_type_id");
-        // space.setManager(getManagerById(managerId));  // Implement this method as needed
-        // space.setSpaceType(getSpaceTypeById(spaceTypeId));  // Implement this method as needed
+        if (!resultSet.wasNull()) {
+            SpaceType spaceType = new SpaceType();
+            spaceType.setSpaceType_id(spaceTypeId);
+            spaceType.setName(resultSet.getString("space_type_name"));
+            space.setSpaceType(spaceType);
+        } else {
+            space.setSpaceType(null); // Handle null space type
+        }
+
+        // Assuming the manager is handled elsewhere
+        // space.setManager(getManagerById(resultSet.getInt("manager_id")));  // Implement if needed
 
         return space;
     }

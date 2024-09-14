@@ -17,6 +17,9 @@ import org.example.service.inter.SpaceService;
 import org.example.service.inter.SpaceTypeService;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -27,7 +30,8 @@ public class GestionSpace {
     private final SpaceTypeService spaceTypeService;
     private final ManagerService managerService;
     private final Scanner scanner;
-    private final Manager currentManager; // Reference to the currently logged-in manager
+    private final Manager currentManager;
+    private final Connection connection;
 
     public GestionSpace(Connection connection, Manager currentManager) {
         SpaceRepository spaceRepository = new SpaceRepositoryImpl(connection);
@@ -41,17 +45,55 @@ public class GestionSpace {
 
         this.scanner = new Scanner(System.in);
         this.currentManager = currentManager;
+        this.connection = connection;
     }
 
+    // Include the method mapRowToSpace in the GestionSpace class
+    private Space mapRowToSpace(ResultSet resultSet) throws SQLException {
+        Space space = new Space();
+        space.setSpace_id(resultSet.getInt("space_id"));
+        space.setName(resultSet.getString("name"));
+        space.setLocation(resultSet.getString("location"));
+        space.setCapacity(resultSet.getInt("capacity"));
+        space.setPrice(resultSet.getInt("price"));
+        space.setAvailable(resultSet.getBoolean("available"));
+
+        // Create SpaceType object
+        SpaceType spaceType = new SpaceType();
+        spaceType.setName(resultSet.getString("space_type_name")); // Ensure that the column name matches
+        space.setSpaceType(spaceType);
+
+        return space;
+    }
+
+    private Optional<Space> findById(Integer space_id) {
+        String sql = "SELECT s.*, st.name AS space_type_name\n" +
+                "FROM spaces s\n" +
+                "LEFT JOIN space_type st ON s.space_type_id = st.space_type_id\n" +
+                "WHERE s.space_id = ?;";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, space_id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    Space space = mapRowToSpace(resultSet);
+                    return Optional.of(space);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return Optional.empty();
+    }
 
     public void displaySpaceMenu() {
         while (true) {
             System.out.println("🔧 Gestion des espaces :");
             System.out.println("1️⃣ Créer un espace");
             System.out.println("2️⃣ Voir tous les espaces");
-            System.out.println("3️⃣ Modifier un espace");
-            System.out.println("4️⃣ Supprimer un espace");
-            System.out.println("5️⃣ Quitter");
+            System.out.println("3️⃣ Voir un espace par ID"); // Add this line
+            System.out.println("4️⃣ Modifier un espace");
+            System.out.println("5️⃣ Supprimer un espace");
+            System.out.println("6️⃣ Quitter");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -64,12 +106,15 @@ public class GestionSpace {
                     viewAllSpaces();
                     break;
                 case 3:
-                    updateSpace();
+                    viewSpaceById(); // Call the new method
                     break;
                 case 4:
-                    deleteSpace();
+                    updateSpace();
                     break;
                 case 5:
+                    deleteSpace();
+                    break;
+                case 6:
                     System.out.println("👋 Retour au menu principal.");
                     return;
                 default:
@@ -78,6 +123,28 @@ public class GestionSpace {
             }
         }
     }
+
+    private void viewSpaceById() {
+        System.out.println("Entrez l'ID de l'espace à afficher : ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        Optional<Space> optionalSpace = spaceService.findById(id);
+        if (optionalSpace.isPresent()) {
+            Space space = optionalSpace.get();
+            System.out.println("📄 Détails de l'espace :");
+            System.out.print("| ID: " + space.getSpace_id());
+            System.out.print("| Nom: " + space.getName());
+            System.out.print("| Localisation: " + space.getLocation());
+            System.out.print("| Capacité: " + space.getCapacity());
+            System.out.print("| Prix: " + space.getPrice());
+            System.out.print("| Disponible: " + space.isAvailable());
+            System.out.println("| Type d'espace: " + space.getSpaceType().getName());
+        } else {
+            System.out.println("⚠️ Aucun espace trouvé avec cet ID.");
+        }
+    }
+
 
     private void createSpace() {
         System.out.println("Entrez le nom de l'espace : ");
@@ -134,10 +201,18 @@ public class GestionSpace {
             System.out.println("⚠️ Aucun espace trouvé.");
         } else {
             System.out.println("📄 Liste des espaces :");
-            spaces.forEach(space ->
-                    System.out.println("ID: " + space.getSpace_id() + " | Nom: " + space.getName() +
-                            " | Localisation: " + space.getLocation() + " | Capacité: " + space.getCapacity() +
-                            " | Prix: " + space.getPrice() + " | Disponible: " + space.isAvailable()));
+            spaces.stream()
+                    .forEach(space -> {
+                        System.out.print("ID: " + space.getSpace_id());
+                        System.out.print("| Name: " + space.getName());
+                        System.out.print("| Location: " + space.getLocation());
+                        System.out.print("| Capacity: " + space.getCapacity());
+                        System.out.print("| Price: " + space.getPrice());
+                        System.out.print("| Available: " + space.isAvailable());
+                        System.out.println("| Space Type: " + space.getSpaceType().getName());
+                       // System.out.println("Manager: " + space.getManager().getUser_name());
+                    });
+
         }
     }
 
@@ -146,27 +221,90 @@ public class GestionSpace {
         int id = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
-        Optional<Space> optionalSpace = spaceService.findById(id);
+        Optional<Space> optionalSpace = findById(id);
         if (optionalSpace.isPresent()) {
             Space space = optionalSpace.get();
+
+            // Si le manager est nul, attribuez le manager actuel
+            if (space.getManager() == null) {
+                space.setManager(currentManager);
+            }
+
             System.out.println("Entrez le nouveau nom (actuel : " + space.getName() + ") : ");
-            String newName = scanner.nextLine();
+            String newName = scanner.nextLine().trim();
+            if (!newName.isEmpty()) {
+                space.setName(newName);
+            }
+
             System.out.println("Entrez la nouvelle localisation (actuelle : " + space.getLocation() + ") : ");
-            String newLocation = scanner.nextLine();
+            String newLocation = scanner.nextLine().trim();
+            if (!newLocation.isEmpty()) {
+                space.setLocation(newLocation);
+            }
+
             System.out.println("Entrez la nouvelle capacité (actuelle : " + space.getCapacity() + ") : ");
-            int newCapacity = scanner.nextInt();
+            String capacityInput = scanner.nextLine().trim();
+            if (!capacityInput.isEmpty()) {
+                try {
+                    int newCapacity = Integer.parseInt(capacityInput);
+                    if (newCapacity > 0) {
+                        space.setCapacity(newCapacity);
+                    } else {
+                        System.out.println("⚠️ La capacité doit être supérieure à zéro.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠️ Valeur invalide pour la capacité.");
+                }
+            }
+
             System.out.println("Entrez le nouveau prix (actuel : " + space.getPrice() + ") : ");
-            int newPrice = scanner.nextInt();
-            System.out.println("L'espace est-il disponible ? (true/false) : ");
-            boolean newAvailable = scanner.nextBoolean();
-            scanner.nextLine(); // Consume newline
+            String priceInput = scanner.nextLine().trim();
+            if (!priceInput.isEmpty()) {
+                try {
+                    int newPrice = Integer.parseInt(priceInput);
+                    if (newPrice >= 0) {
+                        space.setPrice(newPrice);
+                    } else {
+                        System.out.println("⚠️ Le prix doit être supérieur ou égal à zéro.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("⚠️ Valeur invalide pour le prix.");
+                }
+            }
 
-            space.setName(newName);
-            space.setLocation(newLocation);
-            space.setCapacity(newCapacity);
-            space.setPrice(newPrice);
-            space.setAvailable(newAvailable);
+            System.out.println("L'espace est-il disponible ? (actuel : " + space.isAvailable() + ") (true/false) : ");
+            String availableInput = scanner.nextLine().trim();
+            if (!availableInput.isEmpty()) {
+                try {
+                    boolean newAvailable = Boolean.parseBoolean(availableInput);
+                    space.setAvailable(newAvailable);
+                } catch (Exception e) {
+                    System.out.println("⚠️ Valeur invalide pour la disponibilité.");
+                }
+            }
 
+            // Liste des types d'espaces disponibles
+            List<SpaceType> spaceTypes = spaceTypeService.findAll();
+            if (!spaceTypes.isEmpty()) {
+                System.out.println("Choisissez un nouveau type d'espace :");
+                for (int i = 0; i < spaceTypes.size(); i++) {
+                    System.out.println((i + 1) + ". " + spaceTypes.get(i).getName());
+                }
+
+                int typeChoice = scanner.nextInt();
+                scanner.nextLine();
+
+                if (typeChoice >= 1 && typeChoice <= spaceTypes.size()) {
+                    SpaceType chosenSpaceType = spaceTypes.get(typeChoice - 1);
+                    space.setSpaceType(chosenSpaceType);
+                } else {
+                    System.out.println("⚠️ Choix invalide pour le type d'espace.");
+                }
+            } else {
+                System.out.println("⚠️ Aucun type d'espace disponible.");
+            }
+
+            // Mise à jour de l'espace dans la base de données
             spaceService.update(space);
             System.out.println("✅ Espace mis à jour avec succès !");
         } else {
@@ -183,7 +321,7 @@ public class GestionSpace {
         if (isDeleted) {
             System.out.println("✅ Espace supprimé avec succès !");
         } else {
-            System.out.println("⚠️ Aucun espace trouvé avec cet ID.");
+            System.out.println("⚠️ Échec de la suppression de l'espace.");
         }
     }
 }
