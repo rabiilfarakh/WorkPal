@@ -66,24 +66,6 @@ public class GestionSpace {
         return space;
     }
 
-    private Optional<Space> findById(Integer space_id) {
-        String sql = "SELECT s.*, st.name AS space_type_name\n" +
-                "FROM spaces s\n" +
-                "LEFT JOIN space_type st ON s.space_type_id = st.space_type_id\n" +
-                "WHERE s.space_id = ?;";
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setInt(1, space_id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    Space space = mapRowToSpace(resultSet);
-                    return Optional.of(space);
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return Optional.empty();
-    }
 
     public void displaySpaceMenu() {
         while (true) {
@@ -221,7 +203,7 @@ public class GestionSpace {
         int id = scanner.nextInt();
         scanner.nextLine(); // Consume newline
 
-        Optional<Space> optionalSpace = findById(id);
+        Optional<Space> optionalSpace =spaceService.findById(id);
         if (optionalSpace.isPresent()) {
             Space space = optionalSpace.get();
 

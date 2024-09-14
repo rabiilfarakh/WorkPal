@@ -120,6 +120,32 @@ public class SpaceRepositoryImpl implements SpaceRepository {
         return false;
     }
 
+    @Override
+    public List<Space> search(String data) {
+        List<Space> spaces = new ArrayList<>();
+        String sql = "SELECT s.*, st.name AS space_type_name FROM spaces s " +
+                "JOIN space_type st ON s.space_type_id = st.space_type_id " +
+                "WHERE st.name LIKE ? OR s.name LIKE ? OR s.location LIKE ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            String searchData = "%" + data + "%";
+            statement.setString(1, searchData);
+            statement.setString(2, searchData);
+            statement.setString(3, searchData);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Space space = mapRowToSpace(resultSet);
+                    spaces.add(space);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return spaces;
+    }
+
+
     private Space mapRowToSpace(ResultSet resultSet) throws SQLException {
         Space space = new Space();
         space.setSpace_id(resultSet.getInt("space_id"));
@@ -137,12 +163,11 @@ public class SpaceRepositoryImpl implements SpaceRepository {
             spaceType.setName(resultSet.getString("space_type_name"));
             space.setSpaceType(spaceType);
         } else {
-            space.setSpaceType(null); // Handle null space type
+            space.setSpaceType(null);
         }
-
-        // Assuming the manager is handled elsewhere
-        // space.setManager(getManagerById(resultSet.getInt("manager_id")));  // Implement if needed
 
         return space;
     }
+
+
 }

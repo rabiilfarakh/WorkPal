@@ -44,4 +44,9 @@ public class SpaceServiceImpl implements SpaceService {
         // Delegates to repository to delete a space by its ID and returns the result
         return spaceRepository.deletById(space_id);
     }
+
+    @Override
+    public List<Space> search(String data) {
+        return spaceRepository.search(data);
+    }
 }

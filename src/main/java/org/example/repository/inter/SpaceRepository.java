@@ -19,4 +19,6 @@ public interface SpaceRepository {
     Space update(Space space);
 
     boolean deletById(Integer space_id);
+
+    List<Space> search(String data);
 }
